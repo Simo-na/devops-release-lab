@@ -1,0 +1,32 @@
+name: CI - Validate PHP abd Build Docker Image
+
+on:
+  push:
+    branches: [main]
+  pull_requests:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: check out repository
+        uses: actions/checkout@v7
+
+      - name: set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: validate PHP syntax
+        run: php -1 index.php
+
+      - name: Build Docker image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: docker build --tag "devops-release-lab:$IMAGE_TAG" .
